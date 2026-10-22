@@ -1,66 +1,104 @@
-import { useRef, useMemo } from 'react'
+import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+import { Environment, Lightformer, MeshReflectorMaterial, ContactShadows } from '@react-three/drei'
 
 // Automotive Reveal Studio Environment
-// Offline-safe, fully procedural lighting, reflective ground, and volumetric atmosphere
+// Real-time HDR studio lighting rig with Lightformers, glossy reflection floor, and soft contact shadows
 
-export default function EnvironmentStudio({ scrollStoreRef }) {
-  const sweepLightA = useRef()
-  const sweepLightB = useRef()
+// Precompute floating atmospheric dust / light motes
+function createDustPositions(count = 180) {
+  const positions = new Float32Array(count * 3)
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.sin(i * 1.7) * 0.5) * 12
+    positions[i * 3 + 1] = ((i % 25) / 25) * 2.2 + 0.05
+    positions[i * 3 + 2] = (Math.cos(i * 2.3) * 0.5) * 12
+  }
+  return positions
+}
+
+const STATIC_DUST_DATA = createDustPositions(180)
+
+export default function EnvironmentStudio() {
   const dustParticlesRef = useRef()
-
-  // Generate floating atmospheric dust / light motes
-  const dustData = useMemo(() => {
-    const count = 280
-    const positions = new Float32Array(count * 3)
-    const phases = new Float32Array(count)
-
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 14
-      positions[i * 3 + 1] = Math.random() * 2.5 + 0.05
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 14
-      phases[i] = Math.random() * Math.PI * 2
-    }
-
-    return { positions, phases }
-  }, [])
 
   useFrame((state) => {
     const t = state.clock.elapsedTime
-    const data = scrollStoreRef.current?.update(0.016) || { progress: 0 }
-    const p = data.progress
-
-    // Dynamic showroom sweep light moving along vehicle with scroll
-    if (sweepLightA.current) {
-      sweepLightA.current.position.x = THREE.MathUtils.lerp(-3.2, 3.5, p)
-      sweepLightA.current.position.z = THREE.MathUtils.lerp(2.2, -2.8, p)
-      sweepLightA.current.intensity = 16 + Math.sin(t * 2.0) * 2.5
-    }
-
-    if (sweepLightB.current) {
-      sweepLightB.current.position.x = THREE.MathUtils.lerp(2.8, -2.8, p)
-      sweepLightB.current.position.z = THREE.MathUtils.lerp(-2.5, 2.5, p)
-      sweepLightB.current.intensity = 12 + Math.cos(t * 1.8) * 2.0
-    }
-
-    // Drifting dust motes
     if (dustParticlesRef.current) {
-      dustParticlesRef.current.rotation.y = t * 0.015
-      dustParticlesRef.current.position.y = Math.sin(t * 0.25) * 0.04
+      dustParticlesRef.current.rotation.y = t * 0.012
+      dustParticlesRef.current.position.y = Math.sin(t * 0.25) * 0.03
     }
   })
 
   return (
     <>
-      {/* Background color and atmospheric deep fog */}
+      {/* Background color and atmospheric deep studio fog */}
       <color attach="background" args={['#030508']} />
-      <fog attach="fog" args={['#04070d', 4.0, 18.0]} />
+      <fog attach="fog" args={['#030508', 5.0, 22.0]} />
 
-      {/* Primary Key Light (Warm soft silver from high angle) */}
+      {/* ========================================================
+          1. HDR ENVIRONMENT STUDIO SOFTBOX RIG (LIGHTFORMERS)
+          ======================================================== */}
+      <Environment resolution={512}>
+        <group rotation={[-Math.PI / 4, -0.2, 0]}>
+          {/* Main overhead longitudinal studio softbox */}
+          <Lightformer
+            form="rect"
+            intensity={3.2}
+            position={[0, 6, 0]}
+            scale={[16, 5]}
+            color="#ffffff"
+            target={[0, 0, 0]}
+          />
+
+          {/* Left grazing highlight for car shoulder line */}
+          <Lightformer
+            form="rect"
+            intensity={2.2}
+            position={[-7, 2.5, 0]}
+            scale={[14, 2.5]}
+            rotation-y={Math.PI / 2}
+            color="#e6f2ff"
+          />
+
+          {/* Right fill softbox with subtle electric cyan tint */}
+          <Lightformer
+            form="rect"
+            intensity={1.8}
+            position={[7, 2.5, 0]}
+            scale={[14, 2.5]}
+            rotation-y={-Math.PI / 2}
+            color="#d0f4ff"
+          />
+
+          {/* Rear rim kicker for spoiler and rear haunches */}
+          <Lightformer
+            form="circle"
+            intensity={3.0}
+            position={[0, 2.8, -8]}
+            scale={4.5}
+            color="#00e5ff"
+            target={[0, 0.4, 0]}
+          />
+
+          {/* Front nose ground bounce light */}
+          <Lightformer
+            form="ring"
+            intensity={1.2}
+            position={[0, 1.0, 7]}
+            scale={4}
+            color="#6884a0"
+            target={[0, 0.2, 1.8]}
+          />
+        </group>
+      </Environment>
+
+      {/* ========================================================
+          2. DIRECTIONAL STUDIO ILLUMINATION & SHADOWS
+          ======================================================== */}
+      {/* Soft Key Light from 3/4 high angle */}
       <directionalLight
-        position={[5.5, 7.5, 4.0]}
-        intensity={2.8}
+        position={[6, 8, 5]}
+        intensity={1.8}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-near={1}
@@ -69,126 +107,78 @@ export default function EnvironmentStudio({ scrollStoreRef }) {
         shadow-camera-right={4}
         shadow-camera-top={4}
         shadow-camera-bottom={-4}
-        shadow-bias={-0.0004}
+        shadow-bias={-0.0002}
         color="#ffffff"
       />
 
-      {/* Cyber Rim Light (Electric Cyan from opposite low angle) */}
-      <directionalLight position={[-4.5, 3.2, -3.5]} intensity={1.8} color="#00e5ff" />
+      {/* Subtle Cyan Rim Highlight from opposite corner */}
+      <directionalLight position={[-6, 3, -4]} intensity={0.8} color="#00e5ff" />
 
-      {/* Accent Magenta Rim (Subtle highlight on rear surfaces) */}
-      <directionalLight position={[3.5, 2.8, -4.5]} intensity={1.2} color="#ff2a6d" />
-
-      {/* Ambient Fill Light */}
-      <ambientLight intensity={0.45} color="#607890" />
-      <hemisphereLight args={['#00e5ff', '#030508', 0.35]} />
-
-      {/* Dynamic Showroom Sweep Lights */}
-      <pointLight ref={sweepLightA} position={[-2.5, 1.4, 1.8]} intensity={16} distance={8} color="#00e5ff" decay={2} />
-      <pointLight ref={sweepLightB} position={[2.5, 1.2, -1.8]} intensity={12} distance={8} color="#7c4dff" decay={2} />
-      <pointLight position={[0, 2.8, 0]} intensity={8} distance={10} color="#ffffff" decay={2} />
+      {/* Ambient Fill */}
+      <ambientLight intensity={0.35} color="#405060" />
 
       {/* ========================================================
-          POLISHED OBSIDIAN REFLECTIVE FLOOR
+          3. POLISHED OBSIDIAN REFLECTIVE STUDIO FLOOR
           ======================================================== */}
-      <group position={[0, -0.005, 0]}>
-        {/* Main reflective showroom mirror slab */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-          <planeGeometry args={[36, 36]} />
-          <meshStandardMaterial
-            color="#05080e"
-            metalness={0.95}
-            roughness={0.16}
-            envMapIntensity={1.2}
+      <group position={[0, 0, 0]}>
+        {/* Real-time Blurred Mirror Showroom Floor */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.002, 0]} receiveShadow>
+          <planeGeometry args={[40, 40]} />
+          <MeshReflectorMaterial
+            blur={[350, 100]}
+            resolution={512}
+            mixBlur={0.85}
+            mixStrength={1.4}
+            roughness={0.24}
+            depthScale={1.2}
+            minDepthThreshold={0.4}
+            maxDepthThreshold={1.4}
+            color="#06090e"
+            metalness={0.88}
+            mirror={0.55}
           />
         </mesh>
 
-        {/* Soft underbody ground contact shadow plane */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.006, 0]}>
-          <planeGeometry args={[2.8, 5.2]} />
-          <meshBasicMaterial color="#000000" transparent opacity={0.65} />
-        </mesh>
+        {/* Realistic ground-truth tire and chassis contact shadows */}
+        <ContactShadows
+          position={[0, 0.001, 0]}
+          opacity={0.8}
+          scale={7}
+          blur={2.4}
+          far={1.6}
+          resolution={512}
+          color="#000000"
+        />
 
-        {/* Ambient cyan underglow projection plane */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.007, -0.15]}>
-          <planeGeometry args={[1.6, 2.2]} />
-          <meshBasicMaterial color="#00e5ff" transparent opacity={0.12} />
-        </mesh>
+        {/* Elegant Minimalist Technical Showroom Floor Guide */}
+        <gridHelper
+          args={[30, 30, '#00e5ff', '#0d1520']}
+          position={[0, 0.002, 0]}
+        />
 
-        {/* Subtle engineering floor grid */}
-        <gridHelper args={[36, 36, '#00e5ff', '#162230']} position={[0, -0.004, 0]} />
-      </group>
-
-      {/* ========================================================
-          LABORATORY LIGHT STRIPS & ARCHITECTURAL ACCENTS
-          ======================================================== */}
-      <group>
-        {/* Floor Longitudinal Neon Guideway */}
-        <mesh position={[-2.8, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[0.025, 20]} />
-          <meshBasicMaterial color="#00e5ff" transparent opacity={0.8} />
+        {/* Subtle longitudinal floor guidelines */}
+        <mesh position={[-2.4, 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.015, 18]} />
+          <meshBasicMaterial color="#00e5ff" transparent opacity={0.35} />
         </mesh>
-        <mesh position={[2.8, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[0.025, 20]} />
-          <meshBasicMaterial color="#00e5ff" transparent opacity={0.8} />
-        </mesh>
-
-        {/* Lateral Threshold Light Blades */}
-        <mesh position={[0, 0.002, -3.2]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[16, 0.035]} />
-          <meshBasicMaterial color="#7c4dff" transparent opacity={0.6} />
-        </mesh>
-        <mesh position={[0, 0.002, 3.2]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[16, 0.035]} />
-          <meshBasicMaterial color="#00e5ff" transparent opacity={0.7} />
-        </mesh>
-
-        {/* Ceiling Linear Light Bars */}
-        <mesh position={[0, 4.2, 0]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[0.08, 0.04, 18]} />
-          <meshBasicMaterial color="#ffffff" />
-        </mesh>
-        <mesh position={[-3.2, 3.8, 0]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[0.05, 0.03, 14]} />
-          <meshBasicMaterial color="#00e5ff" />
-        </mesh>
-        <mesh position={[3.2, 3.8, 0]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[0.05, 0.03, 14]} />
-          <meshBasicMaterial color="#7c4dff" />
+        <mesh position={[2.4, 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.015, 18]} />
+          <meshBasicMaterial color="#00e5ff" transparent opacity={0.35} />
         </mesh>
       </group>
 
       {/* ========================================================
-          DISTANT ARCHITECTURAL MONOLITHS (LAB 07 DEPTH)
-          ======================================================== */}
-      <group position={[0, 0, -8.5]}>
-        {[-8, -4, 4, 8].map((x, idx) => (
-          <group key={idx} position={[x, 3.5, 0]}>
-            <mesh castShadow receiveShadow>
-              <boxGeometry args={[0.7, 7, 0.7]} />
-              <meshStandardMaterial color="#080c14" metalness={0.7} roughness={0.3} />
-            </mesh>
-            {/* Vertical cyan neon groove */}
-            <mesh position={[0, 0, 0.36]}>
-              <boxGeometry args={[0.02, 6.8, 0.01]} />
-              <meshBasicMaterial color="#00e5ff" transparent opacity={0.4} />
-            </mesh>
-          </group>
-        ))}
-      </group>
-
-      {/* ========================================================
-          FLOATING ATMOSPHERIC DUST & LIGHT MOTES
+          4. FLOATING ATMOSPHERIC LIGHT PARTICLES
           ======================================================== */}
       <points ref={dustParticlesRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[dustData.positions, 3]} />
+          <bufferAttribute attach="attributes-position" args={[STATIC_DUST_DATA, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.022}
-          color="#a8d8f0"
+          size={0.018}
+          color="#8ec8e8"
           transparent
-          opacity={0.35}
+          opacity={0.25}
           sizeAttenuation
           depthWrite={false}
         />

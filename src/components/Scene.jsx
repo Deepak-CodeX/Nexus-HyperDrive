@@ -1,4 +1,5 @@
-import React, { Component, useRef } from 'react'
+import React, { Component } from 'react'
+import { useFrame } from '@react-three/fiber'
 import ProceduralHypercar from './ProceduralHypercar'
 import CinemaCamera from './CinemaCamera'
 import EnvironmentStudio from './EnvironmentStudio'
@@ -8,11 +9,11 @@ import { scrollStore } from '../lib/scrollStore'
 class WebGLErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { hasError: false, error: null }
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
   }
 
   componentDidCatch(error, errorInfo) {
@@ -23,9 +24,9 @@ class WebGLErrorBoundary extends Component {
     if (this.state.hasError) {
       return (
         <group>
-          <ambientLight intensity={1} />
-          <mesh position={[0, 0.5, 0]}>
-            <boxGeometry args={[1.8, 0.4, 4.0]} />
+          <ambientLight intensity={1.5} />
+          <mesh position={[0, 0.4, 0]}>
+            <boxGeometry args={[1.9, 0.4, 4.2]} />
             <meshStandardMaterial color="#0c131a" metalness={0.9} roughness={0.2} />
           </mesh>
         </group>
@@ -35,19 +36,30 @@ class WebGLErrorBoundary extends Component {
   }
 }
 
-export default function Scene({ focusedKey }) {
-  const storeRef = useRef(scrollStore)
+function SceneContent() {
+  // Single-source update per animation frame
+  useFrame((state, delta) => {
+    scrollStore.update(delta)
+  })
 
   return (
-    <WebGLErrorBoundary>
+    <>
       {/* 6-Scene Cinema Camera Director */}
-      <CinemaCamera scrollStoreRef={storeRef} focusedKey={focusedKey} />
+      <CinemaCamera />
 
-      {/* Autonomous Automotive Reveal Studio (Procedural, Offline-Safe) */}
-      <EnvironmentStudio scrollStoreRef={storeRef} />
+      {/* Autonomous Automotive Reveal Studio */}
+      <EnvironmentStudio />
 
-      {/* Procedural 2035 Autonomous Electric Hypercar */}
-      <ProceduralHypercar scrollStoreRef={storeRef} focusedKey={focusedKey} />
+      {/* Realistic 2035 Autonomous Electric Hypercar */}
+      <ProceduralHypercar />
+    </>
+  )
+}
+
+export default function Scene() {
+  return (
+    <WebGLErrorBoundary>
+      <SceneContent />
     </WebGLErrorBoundary>
   )
 }

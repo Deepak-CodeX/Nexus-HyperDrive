@@ -1,15 +1,16 @@
 import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { scrollStore } from '../lib/scrollStore'
 
 // 6-Scene Cinematic Camera Director
-// Controls camera position, lookAt target, FOV, and velocity shake across scroll timeline
+// Professional automotive framing with deliberate negative space for editorial typography
 
-export default function CinemaCamera({ scrollStoreRef, focusedKey }) {
+export default function CinemaCamera() {
   const { camera } = useThree()
   const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 })
-  const currentCamPos = useRef(new THREE.Vector3(0.52, 0.28, 1.25))
-  const currentLookAt = useRef(new THREE.Vector3(0.25, 0.22, 1.85))
+  const currentCamPos = useRef(new THREE.Vector3(2.5, 0.75, 3.2))
+  const currentLookAt = useRef(new THREE.Vector3(0.0, 0.35, 0.1))
 
   // Mouse parallax tracker
   useEffect(() => {
@@ -22,116 +23,126 @@ export default function CinemaCamera({ scrollStoreRef, focusedKey }) {
   }, [])
 
   // 6-Scene Timeline Keyframes: [pos, target, fov]
+  // Framed so the car is prominent, elegant, and positioned with generous negative space
   const timelineKeyframes = useMemo(
     () => [
-      // SCENE 01 — AWAKEN (0.00 - 0.16)
-      // Macro close-up on front laser headlight lens
+      // SCENE 01 — HERO / AWAKEN (0.00 - 0.16)
+      // Elevated front 3/4 hero angle, giving full view of car stance and front laser blades
       {
         p: 0.0,
-        cam: [0.58, 0.26, 2.38],
-        tgt: [0.65, 0.22, 2.05],
-        fov: 30,
+        cam: [2.7, 1.15, 4.0],
+        tgt: [0.0, 0.65, 0.1],
+        fov: 32,
       },
       {
-        p: 0.14,
-        cam: [0.85, 0.32, 2.65],
-        tgt: [0.45, 0.22, 1.75],
-        fov: 34,
+        p: 0.15,
+        cam: [2.8, 0.92, 2.8],
+        tgt: [0.1, 0.48, 0.15],
+        fov: 33,
       },
 
-      // SCENE 02 — FORM (0.16 - 0.35)
-      // Sweeping orbit across front 3/4, front wheel, hood curvature, and cockpit
+      // SCENE 02 — DESIGN & SCULPTED FORM (0.16 - 0.38)
+      // Car placed in right half of screen, leaving left half open for the floating glass card
       {
-        p: 0.22,
-        cam: [1.65, 0.42, 2.15],
-        tgt: [0.25, 0.20, 0.45],
+        p: 0.24,
+        cam: [3.2, 0.75, 1.4],
+        tgt: [-0.4, 0.35, 0.1],
+        fov: 36,
+      },
+      {
+        p: 0.36,
+        cam: [3.4, 0.85, -0.2],
+        tgt: [-0.3, 0.38, -0.1],
+        fov: 36,
+      },
+
+      // SCENE 03 — AERODYNAMICS & LAMINAR FLOW (0.38 - 0.58)
+      // Car placed in left half of screen, leaving right half open for the floating glass card
+      {
+        p: 0.46,
+        cam: [3.2, 0.95, -1.5],
+        tgt: [0.4, 0.4, -0.3],
+        fov: 37,
+      },
+      {
+        p: 0.56,
+        cam: [2.2, 0.8, -2.6],
+        tgt: [0.3, 0.36, -0.6],
+        fov: 36,
+      },
+
+      // SCENE 04 — QUANTUM POWER CORE (0.58 - 0.76)
+      // Low rear 3/4 framing the illuminated underbody quantum core and ruby lightbar
+      {
+        p: 0.64,
+        cam: [1.8, 0.48, -2.8],
+        tgt: [-0.3, 0.3, -0.4],
+        fov: 35,
+      },
+      {
+        p: 0.74,
+        cam: [-1.8, 0.65, -2.6],
+        tgt: [-0.2, 0.32, -0.4],
+        fov: 36,
+      },
+
+      // SCENE 05 — NEURAL AI ARCHITECTURE (0.76 - 0.90)
+      // Elevated dramatic diagonal overview displaying full distributed AI sensor nodes
+      {
+        p: 0.80,
+        cam: [-2.8, 1.3, -0.6],
+        tgt: [0.3, 0.36, 0.0],
         fov: 38,
       },
       {
-        p: 0.32,
-        cam: [2.35, 0.55, 1.15],
-        tgt: [0.0, 0.22, 0.15],
-        fov: 42,
+        p: 0.88,
+        cam: [-2.4, 1.15, 1.6],
+        tgt: [0.3, 0.35, 0.1],
+        fov: 37,
       },
 
-      // SCENE 03 — AERODYNAMICS (0.35 - 0.52)
-      // Side profile tracking active splitter and rear morphing wing
+      // SCENE 06 — INTERACTIVE SHOWCASE / ASCENSION (0.90 - 1.00)
+      // Monumental cinematic perspective centered above configurator controls
       {
-        p: 0.42,
-        cam: [2.45, 0.62, -0.45],
-        tgt: [0.0, 0.25, -0.15],
-        fov: 46,
-      },
-      {
-        p: 0.50,
-        cam: [1.95, 0.72, -1.55],
-        tgt: [-0.15, 0.28, -0.65],
-        fov: 48,
-      },
-
-      // SCENE 04 — POWER (0.52 - 0.70)
-      // Low angle looking toward central underbody quantum energy core and rear diffuser
-      {
-        p: 0.58,
-        cam: [1.25, 0.42, -1.95],
-        tgt: [0.0, 0.22, -0.25],
-        fov: 44,
-      },
-      {
-        p: 0.68,
-        cam: [-0.75, 0.48, -2.45],
-        tgt: [0.0, 0.24, -0.85],
-        fov: 46,
-      },
-
-      // SCENE 05 — INTELLIGENCE (0.70 - 0.86)
-      // Elevated dynamic 3/4 orbit revealing entire neural network mesh
-      {
-        p: 0.76,
-        cam: [-1.95, 0.88, -1.15],
-        tgt: [0.0, 0.26, 0.0],
-        fov: 48,
-      },
-      {
-        p: 0.84,
-        cam: [-1.65, 0.95, 1.35],
-        tgt: [0.0, 0.24, 0.15],
-        fov: 46,
-      },
-
-      // SCENE 06 — ASCENSION (0.86 - 1.00)
-      // Monumental hero composition pulling back to wide cinematic silhouette
-      {
-        p: 0.94,
-        cam: [-0.55, 0.92, 3.45],
-        tgt: [0.0, 0.24, 0.0],
-        fov: 40,
+        p: 0.95,
+        cam: [0.0, 1.1, 4.4],
+        tgt: [0.0, 0.45, 0.0],
+        fov: 35,
       },
       {
         p: 1.0,
-        cam: [0.0, 0.82, 3.85],
-        tgt: [0.0, 0.22, 0.0],
-        fov: 38,
+        cam: [0.0, 1.1, 4.4],
+        tgt: [0.0, 0.45, 0.0],
+        fov: 35,
       },
     ],
     []
   )
 
-  // Interactive component inspection focus viewpoints
-  const focusTargets = useMemo(
+  // Camera viewpoints for component inspection and showcase presets
+  const viewpoints = useMemo(
     () => ({
-      aero: { cam: [1.15, 0.35, 2.25], tgt: [0.45, 0.18, 1.85], fov: 32 },
-      drag: { cam: [2.15, 0.48, 0.35], tgt: [0.0, 0.22, 0.15], fov: 36 },
-      power: { cam: [0.85, 0.38, -0.95], tgt: [0.0, 0.22, -0.15], fov: 34 },
-      battery: { cam: [1.45, 0.32, 0.65], tgt: [0.15, 0.18, 0.25], fov: 34 },
-      torque: { cam: [1.25, 0.35, -1.65], tgt: [0.45, 0.18, -1.25], fov: 32 },
-      range: { cam: [1.35, 0.65, 1.15], tgt: [0.0, 0.35, 0.25], fov: 36 },
-      intelligence: { cam: [0.95, 0.85, 0.85], tgt: [0.0, 0.35, 0.2], fov: 40 },
+      // Interactive Spec Hotspots
+      aero: { cam: [1.6, 0.52, 2.4], tgt: [0.0, 0.28, 1.5], fov: 32 },
+      drag: { cam: [3.0, 0.55, 0.4], tgt: [0.0, 0.32, 0.0], fov: 35 },
+      power: { cam: [1.6, 0.42, -1.6], tgt: [0.0, 0.26, -0.2], fov: 32 },
+      battery: { cam: [2.0, 0.45, 0.6], tgt: [0.0, 0.22, 0.2], fov: 32 },
+      torque: { cam: [1.8, 0.42, -2.0], tgt: [0.2, 0.24, -1.2], fov: 32 },
+      range: { cam: [1.8, 0.9, 1.2], tgt: [0.0, 0.36, 0.2], fov: 35 },
+      intelligence: { cam: [-1.6, 1.1, 1.0], tgt: [0.0, 0.38, 0.1], fov: 36 },
+
+      // Showcase Presets
+      front: { cam: [0.0, 0.6, 3.6], tgt: [0.0, 0.34, 0.2], fov: 34 },
+      profile: { cam: [3.6, 0.55, 0.0], tgt: [0.0, 0.34, 0.0], fov: 36 },
+      rear: { cam: [0.0, 0.7, -3.6], tgt: [0.0, 0.36, -0.2], fov: 34 },
+      wing: { cam: [1.4, 0.9, -2.2], tgt: [0.0, 0.54, -1.5], fov: 30 },
+      core: { cam: [1.5, 0.38, -0.9], tgt: [0.0, 0.25, -0.1], fov: 30 },
+      top: { cam: [0.0, 4.4, 0.1], tgt: [0.0, 0.2, 0.0], fov: 35 },
     }),
     []
   )
 
-  // Interpolation helper with cubic smoothstep easing
+  // Smoothstep interpolation helper
   const evaluateTimeline = (p) => {
     const kfs = timelineKeyframes
     let k0 = kfs[0]
@@ -147,93 +158,91 @@ export default function CinemaCamera({ scrollStoreRef, focusedKey }) {
 
     const span = Math.max(k1.p - k0.p, 0.0001)
     const normalized = THREE.MathUtils.clamp((p - k0.p) / span, 0, 1)
-    // Cubic smoothstep easing for cinema-grade motion
+    // Cubic smoothstep easing
     const ease = normalized * normalized * (3 - 2 * normalized)
 
-    const cam = [
-      THREE.MathUtils.lerp(k0.cam[0], k1.cam[0], ease),
-      THREE.MathUtils.lerp(k0.cam[1], k1.cam[1], ease),
-      THREE.MathUtils.lerp(k0.cam[2], k1.cam[2], ease),
-    ]
-
-    const tgt = [
-      THREE.MathUtils.lerp(k0.tgt[0], k1.tgt[0], ease),
-      THREE.MathUtils.lerp(k0.tgt[1], k1.tgt[1], ease),
-      THREE.MathUtils.lerp(k0.tgt[2], k1.tgt[2], ease),
-    ]
-
-    const fov = THREE.MathUtils.lerp(k0.fov, k1.fov, ease)
-
-    return { cam, tgt, fov }
+    return {
+      cam: [
+        THREE.MathUtils.lerp(k0.cam[0], k1.cam[0], ease),
+        THREE.MathUtils.lerp(k0.cam[1], k1.cam[1], ease),
+        THREE.MathUtils.lerp(k0.cam[2], k1.cam[2], ease),
+      ],
+      tgt: [
+        THREE.MathUtils.lerp(k0.tgt[0], k1.tgt[0], ease),
+        THREE.MathUtils.lerp(k0.tgt[1], k1.tgt[1], ease),
+        THREE.MathUtils.lerp(k0.tgt[2], k1.tgt[2], ease),
+      ],
+      fov: THREE.MathUtils.lerp(k0.fov, k1.fov, ease),
+    }
   }
 
   useFrame((state, delta) => {
-    const t = state.clock.elapsedTime
-    const data = scrollStoreRef.current?.update(delta) || {
-      progress: 0,
-      velocity: 0,
-      focusedKey: null,
-      focusProgress: 0,
-    }
+    // Read the single-source updated frame state directly
+    const data = scrollStore.getState()
 
     const { cam: baseCam, tgt: baseTgt, fov: baseFov } = evaluateTimeline(data.progress)
 
-    // Blend into focused component target if user clicked a specification
     let finalCam = [...baseCam]
     let finalTgt = [...baseTgt]
     let finalFov = baseFov
 
-    const fKey = data.focusedKey
-    if (fKey && focusTargets[fKey]) {
-      const fTarget = focusTargets[fKey]
-      const fWeight = THREE.MathUtils.clamp(data.focusProgress, 0, 1)
-      finalCam[0] = THREE.MathUtils.lerp(finalCam[0], fTarget.cam[0], fWeight)
-      finalCam[1] = THREE.MathUtils.lerp(finalCam[1], fTarget.cam[1], fWeight)
-      finalCam[2] = THREE.MathUtils.lerp(finalCam[2], fTarget.cam[2], fWeight)
+    // Blend into targeted viewpoint (focus hotspot or camera preset)
+    const targetKey = data.focusedKey || data.cameraPreset
+    if (targetKey && viewpoints[targetKey]) {
+      const target = viewpoints[targetKey]
+      const weight = THREE.MathUtils.clamp(data.focusProgress, 0, 1)
 
-      finalTgt[0] = THREE.MathUtils.lerp(finalTgt[0], fTarget.tgt[0], fWeight)
-      finalTgt[1] = THREE.MathUtils.lerp(finalTgt[1], fTarget.tgt[1], fWeight)
-      finalTgt[2] = THREE.MathUtils.lerp(finalTgt[2], fTarget.tgt[2], fWeight)
+      finalCam[0] = THREE.MathUtils.lerp(finalCam[0], target.cam[0], weight)
+      finalCam[1] = THREE.MathUtils.lerp(finalCam[1], target.cam[1], weight)
+      finalCam[2] = THREE.MathUtils.lerp(finalCam[2], target.cam[2], weight)
 
-      finalFov = THREE.MathUtils.lerp(finalFov, fTarget.fov, fWeight)
+      finalTgt[0] = THREE.MathUtils.lerp(finalTgt[0], target.tgt[0], weight)
+      finalTgt[1] = THREE.MathUtils.lerp(finalTgt[1], target.tgt[1], weight)
+      finalTgt[2] = THREE.MathUtils.lerp(finalTgt[2], target.tgt[2], weight)
+
+      finalFov = THREE.MathUtils.lerp(finalFov, target.fov, weight)
     }
 
-    // Smooth mouse parallax
-    mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05
-    mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05
-    const parallaxX = mouseRef.current.x * 0.08
-    const parallaxY = mouseRef.current.y * 0.05
+    // Parallax & Subtle sway
+    let parallaxX = 0
+    let parallaxY = 0
+    let breathX = 0
+    let breathY = 0
 
-    // Velocity-proportional cinematic camera shake
-    const shakeIntensity = THREE.MathUtils.clamp(data.velocity * 0.012, 0, 0.04)
-    const shakeX = Math.sin(t * 22) * shakeIntensity
-    const shakeY = Math.cos(t * 28) * shakeIntensity
+    if (!data.reducedMotion) {
+      mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.05
+      mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.05
+      parallaxX = mouseRef.current.x * 0.06
+      parallaxY = mouseRef.current.y * 0.04
 
-    // Subtle gentle camera breathing (handheld studio feel)
-    const breathX = Math.sin(t * 0.7) * 0.005
-    const breathY = Math.cos(t * 0.9) * 0.004
+      const t = state.clock.elapsedTime
+      breathX = Math.sin(t * 0.6) * 0.004
+      breathY = Math.cos(t * 0.8) * 0.003
+    }
 
-    // Target vectors
     const targetCamVec = new THREE.Vector3(
-      finalCam[0] + parallaxX + shakeX + breathX,
-      finalCam[1] + parallaxY + shakeY + breathY,
+      finalCam[0] + parallaxX + breathX,
+      finalCam[1] + parallaxY + breathY,
       finalCam[2]
     )
     const targetLookVec = new THREE.Vector3(finalTgt[0], finalTgt[1], finalTgt[2])
 
-    // Failsafe validation against NaN
+    // Frame-rate independent exponential damping: factor = 1 - Math.exp(-decay * delta)
+    const clampedDelta = Math.min(Math.max(delta, 0.001), 0.1)
+    const damp = 1 - Math.exp(-9 * clampedDelta)
+
     if (!Number.isNaN(targetCamVec.x) && !Number.isNaN(targetCamVec.y) && !Number.isNaN(targetCamVec.z)) {
-      currentCamPos.current.lerp(targetCamVec, 0.08)
+      currentCamPos.current.lerp(targetCamVec, damp)
       camera.position.copy(currentCamPos.current)
     }
 
     if (!Number.isNaN(targetLookVec.x) && !Number.isNaN(targetLookVec.y) && !Number.isNaN(targetLookVec.z)) {
-      currentLookAt.current.lerp(targetLookVec, 0.08)
+      currentLookAt.current.lerp(targetLookVec, damp)
       camera.lookAt(currentLookAt.current)
     }
 
     if (!Number.isNaN(finalFov)) {
-      camera.fov = THREE.MathUtils.lerp(camera.fov, finalFov, 0.06)
+      camera.fov = THREE.MathUtils.lerp(camera.fov, finalFov, damp)
       camera.updateProjectionMatrix()
     }
   })

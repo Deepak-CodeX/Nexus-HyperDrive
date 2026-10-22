@@ -8,23 +8,25 @@ export default function Hypercar({ progress }) {
   const core = useRef(), wing = useRef()
   const wheelFL = useRef(), wheelFR = useRef(), wheelRL = useRef(), wheelRR = useRef()
 
-  // materials
-  const bodyMat = useMemo(()=> new THREE.MeshPhysicalMaterial({
-    color: '#0f1820',
-    metalness: 0.92,
-    roughness: 0.22,
-    clearcoat: 1,
-    clearcoatRoughness: 0.12,
-    envMapIntensity: 1.1,
-  }),[])
-  const carbonMat = useMemo(()=> new THREE.MeshStandardMaterial({ color:'#0a0d12', metalness:0.55, roughness:0.55 }),[])
-  const glassMat = useMemo(()=> new THREE.MeshPhysicalMaterial({ color:'#081018', metalness:0.2, roughness:0.04, transmission:0.55, thickness:0.12, transparent:true, opacity:0.92 }),[])
-  const rubberMat = useMemo(()=> new THREE.MeshStandardMaterial({ color:'#0a0c0f', roughness:0.92, metalness:0.02 }),[])
-
-  // headlight material animated
-  const headMat = useMemo(()=> new THREE.MeshStandardMaterial({ color:'#eaffff', emissive:'#00e5ff', emissiveIntensity: 0, toneMapped:false }),[])
-  const tailMat = useMemo(()=> new THREE.MeshStandardMaterial({ color:'#ff2a6d', emissive:'#ff2a6d', emissiveIntensity:0.0, toneMapped:false }),[])
-  const coreMat = useMemo(()=> new THREE.MeshStandardMaterial({ color:'#00e5ff', emissive:'#00e5ff', emissiveIntensity:1.4, toneMapped:false }),[])
+  const { bodyMat, carbonMat, glassMat, rubberMat, headMat, tailMat, coreMat } = useMemo(
+    () => ({
+      bodyMat: new THREE.MeshPhysicalMaterial({
+        color: '#0f1820',
+        metalness: 0.92,
+        roughness: 0.22,
+        clearcoat: 1,
+        clearcoatRoughness: 0.12,
+        envMapIntensity: 1.1,
+      }),
+      carbonMat: new THREE.MeshStandardMaterial({ color: '#0a0d12', metalness: 0.55, roughness: 0.55 }),
+      glassMat: new THREE.MeshPhysicalMaterial({ color: '#081018', metalness: 0.2, roughness: 0.04, transmission: 0.55, thickness: 0.12, transparent: true, opacity: 0.92 }),
+      rubberMat: new THREE.MeshStandardMaterial({ color: '#0a0c0f', roughness: 0.92, metalness: 0.02 }),
+      headMat: new THREE.MeshStandardMaterial({ color: '#eaffff', emissive: '#00e5ff', emissiveIntensity: 0, toneMapped: false }),
+      tailMat: new THREE.MeshStandardMaterial({ color: '#ff2a6d', emissive: '#ff2a6d', emissiveIntensity: 0.0, toneMapped: false }),
+      coreMat: new THREE.MeshStandardMaterial({ color: '#00e5ff', emissive: '#00e5ff', emissiveIntensity: 1.4, toneMapped: false }),
+    }),
+    []
+  )
 
   useFrame((state)=>{
     const t= state.clock.elapsedTime
