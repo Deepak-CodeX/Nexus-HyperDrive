@@ -3,11 +3,11 @@
 
 export const SECTIONS = [
   { id: 'scene-hero', label: 'OVERVIEW', p: 0.0 },
-  { id: 'scene-form', label: 'DESIGN', p: 0.22 },
-  { id: 'scene-aero', label: 'AERODYNAMICS', p: 0.44 },
-  { id: 'scene-power', label: 'QUANTUM CORE', p: 0.65 },
-  { id: 'scene-intelligence', label: 'NEURAL AI', p: 0.82 },
-  { id: 'scene-showcase', label: 'SHOWCASE', p: 0.98 },
+  { id: 'scene-form', label: 'DESIGN', p: 0.20 },
+  { id: 'scene-aero', label: 'AERODYNAMICS', p: 0.40 },
+  { id: 'scene-power', label: 'QUANTUM CORE', p: 0.60 },
+  { id: 'scene-intelligence', label: 'NEURAL AI', p: 0.80 },
+  { id: 'scene-showcase', label: 'SHOWCASE', p: 1.0 },
 ]
 
 export const PAINT_COLORS = [
@@ -177,6 +177,11 @@ class ScrollStore {
 
   scrollToSection(index) {
     if (index < 0 || index >= SECTIONS.length) return
+    const el = document.getElementById(SECTIONS[index].id)
+    if (el) {
+      el.scrollIntoView({ behavior: this.reducedMotion ? 'auto' : 'smooth' })
+      return
+    }
     const targetP = SECTIONS[index].p
     this.scrollToProgress(targetP)
   }

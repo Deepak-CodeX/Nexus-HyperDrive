@@ -34,14 +34,12 @@ function RealisticHypercarMesh({ materials, onWheelRefsReady }) {
         child.receiveShadow = true
 
         const name = child.name.toLowerCase()
-        if (name === 'chrome') {
-          // Conceal legacy emblem to maintain pure concept branding
+        if (name === 'chrome' || name === 'blue' || name.includes('yellow')) {
+          // Conceal legacy emblem & shield badges to maintain pure concept branding
           child.visible = false
         } else if (name.includes('centre') || name.includes('center')) {
           // Sleek carbon fiber wheel center caps
           child.material = materials.carbon
-        } else if (name.includes('yellow')) {
-          child.material = materials.cyanTrim
         } else if (name.includes('body')) {
           child.material = materials.bodyPaint
         } else if (name.includes('rim')) {

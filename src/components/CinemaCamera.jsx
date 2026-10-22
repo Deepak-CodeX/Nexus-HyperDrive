@@ -26,7 +26,7 @@ export default function CinemaCamera() {
   // Framed so the car is prominent, elegant, and positioned with generous negative space
   const timelineKeyframes = useMemo(
     () => [
-      // SCENE 01 — HERO / AWAKEN (0.00 - 0.16)
+      // SCENE 01 — HERO / AWAKEN (0.00 - 0.12)
       // Elevated front 3/4 hero angle, giving full view of car stance and front laser blades
       {
         p: 0.0,
@@ -35,52 +35,52 @@ export default function CinemaCamera() {
         fov: 32,
       },
       {
-        p: 0.15,
-        cam: [2.8, 0.92, 2.8],
+        p: 0.10,
+        cam: [2.8, 0.95, 2.8],
         tgt: [0.1, 0.48, 0.15],
         fov: 33,
       },
 
-      // SCENE 02 — DESIGN & SCULPTED FORM (0.16 - 0.38)
+      // SCENE 02 — DESIGN & SCULPTED FORM (0.16 - 0.30)
       // Car placed in right half of screen, leaving left half open for the floating glass card
       {
-        p: 0.24,
+        p: 0.20,
         cam: [3.2, 0.75, 1.4],
         tgt: [-0.4, 0.35, 0.1],
         fov: 36,
       },
       {
-        p: 0.36,
+        p: 0.28,
         cam: [3.4, 0.85, -0.2],
         tgt: [-0.3, 0.38, -0.1],
         fov: 36,
       },
 
-      // SCENE 03 — AERODYNAMICS & LAMINAR FLOW (0.38 - 0.58)
+      // SCENE 03 — AERODYNAMICS & LAMINAR FLOW (0.36 - 0.50)
       // Car placed in left half of screen, leaving right half open for the floating glass card
       {
-        p: 0.46,
+        p: 0.40,
         cam: [3.2, 0.95, -1.5],
         tgt: [0.4, 0.4, -0.3],
         fov: 37,
       },
       {
-        p: 0.56,
+        p: 0.48,
         cam: [2.2, 0.8, -2.6],
         tgt: [0.3, 0.36, -0.6],
         fov: 36,
       },
 
-      // SCENE 04 — QUANTUM POWER CORE (0.58 - 0.76)
+      // SCENE 04 — QUANTUM POWER CORE (0.56 - 0.70)
       // Low rear 3/4 framing the illuminated underbody quantum core and ruby lightbar
       {
-        p: 0.64,
+        p: 0.60,
         cam: [1.8, 0.48, -2.8],
         tgt: [-0.3, 0.3, -0.4],
         fov: 35,
       },
       {
-        p: 0.74,
+        p: 0.68,
         cam: [-1.8, 0.65, -2.6],
         tgt: [-0.2, 0.32, -0.4],
         fov: 36,
@@ -101,10 +101,10 @@ export default function CinemaCamera() {
         fov: 37,
       },
 
-      // SCENE 06 — INTERACTIVE SHOWCASE / ASCENSION (0.90 - 1.00)
+      // SCENE 06 — INTERACTIVE SHOWCASE / ASCENSION (0.94 - 1.00)
       // Monumental cinematic perspective centered above configurator controls
       {
-        p: 0.95,
+        p: 0.96,
         cam: [0.0, 1.1, 4.4],
         tgt: [0.0, 0.45, 0.0],
         fov: 35,
